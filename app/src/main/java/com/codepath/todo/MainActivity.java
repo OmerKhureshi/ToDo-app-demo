@@ -15,6 +15,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
@@ -26,6 +30,8 @@ public class MainActivity extends AppCompatActivity
     public static final int REQUEST_CODE_CREATE = 20;
     public static final int REQUEST_CODE_EDIT = 30;
 
+    private static final String FILE_NAME = "file_todo_list.txt";
+
     ArrayList<String> itemsArrayList;
     ArrayAdapter<String> itemsAdapter;
     ListView lvItems;
@@ -36,15 +42,12 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Your to do list");
 
         lvItems = (ListView) findViewById(R.id.lvItems);
-        itemsArrayList = new ArrayList<>();
+        readItems();
         itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, itemsArrayList);
         lvItems.setAdapter(itemsAdapter);
-        itemsArrayList.add("Welcome!");
-        itemsArrayList.add("Click on me to edit");
-        itemsArrayList.add("You can delete as well");
-        itemsArrayList.add("Press on add to create new item");
 
         lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -59,7 +62,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -69,7 +71,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        getSupportActionBar().setTitle("Your to do list");
     }
 
     public void createItem(View view) {
@@ -132,7 +133,7 @@ public class MainActivity extends AppCompatActivity
 
                 String item = data.getExtras().getString(EXTRA_MESSAGE);
                 System.out.println("Created item: " + item);
-                itemsArrayList.add(item);
+                addItem(item);
 
             } else if (requestCode == REQUEST_CODE_EDIT) {
 
@@ -141,18 +142,67 @@ public class MainActivity extends AppCompatActivity
                     String item = data.getExtras().getString(EXTRA_MESSAGE);
                     int pos = data.getExtras().getInt(EXTRA_MESSAGE_POS);
                     System.out.println("Edited item: " + item);
-                    itemsArrayList.set(pos, item);
+                    addItem(pos, item);
+
 
                 } else if (action.equalsIgnoreCase("EDIT_DELETE")) {
 
                     int pos = data.getExtras().getInt(EXTRA_MESSAGE_POS);
                     System.out.println("deleting " + pos);
-                    itemsArrayList.remove(pos);
-
+                    removeItem(pos);
                 }
             }
 
             itemsAdapter.notifyDataSetChanged();
         }
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        writeItems();
+    }
+
+
+    public void addItem(String item) {
+        itemsArrayList.add(item);
+        itemsAdapter.notifyDataSetChanged();
+    }
+
+    public void addItem(int pos, String item) {
+        itemsArrayList.set(pos, item);
+        itemsAdapter.notifyDataSetChanged();
+    }
+
+    public void readItems() {
+        File filesDir = getFilesDir();
+        File todoFile = new File(filesDir, "todo.txt");
+        try {
+            itemsArrayList = new ArrayList<String>(FileUtils.readLines(todoFile));
+        } catch (IOException e) {
+            itemsArrayList = new ArrayList<String>();
+            itemsArrayList.add("Welcome!");
+            itemsArrayList.add("Click on me to edit");
+            itemsArrayList.add("You can delete as well");
+            itemsArrayList.add("Press on add to create new item");
+
+        }
+    }
+
+    public void writeItems() {
+        File filesDir = getFilesDir();
+        File todoFile = new File(filesDir, "todo.txt");
+        try {
+            FileUtils.writeLines(todoFile, itemsArrayList);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void removeItem(int pos) {
+        itemsArrayList.remove(pos);
+        itemsAdapter.notifyDataSetChanged();
+    }
+
 }
