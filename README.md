@@ -41,11 +41,19 @@ As part of your pre-work submission, please reflect on the app and answer the fo
 
 **Question 1:** "What are your reactions to the Android app development platform so far? Compare and contrast Android's approach to layouts and user interfaces in past platforms you've used."
 
-**Answer:** [Enter your answer here in a paragraph or two].
+**Answer:** I have had previous experience building simple Android apps and I feel it's not difficult to get started learning Android app development. However, there is a huge list of concepts that are a developer must understand to build slightly complex apps. But there are very good resources on internet, including the CodePath cliffnotes and the official Android documentation, to learn new APIs and understand their usage.
+
+I have previously used JavaFX and feel it is very similar to the Android layouting framework, in that both provide an XML based layouting that can be augmented dynamically with java. This enables a cleaner seperation of views from logic.
 
 **Question 2:** "Take a moment to reflect on the `ArrayAdapter` used in your pre-work. How would you describe an adapter in this context and what is its function in Android? Why do you think the adapter is important? Explain the purpose of the `convertView` in the `getView` method of the `ArrayAdapter`."
 
-**Answer:** [Enter your answer here in a paragraph or two].
+**Answer:** As per documentation, when using a list based UI element backed by a collection, the `ArrayAdapter` provides objects that will populate each element in the list. By default the `toString` method is invoked on each element of the collection object and populated as a `TextView` on the UI. 
+
+The `ArrayAdapter` invokes the `getView` method to obtain a view to display. If required, the view can be customized by overriding the `getView` method to return the custom view as desired. 
+
+In order to improve performace and memory, the `ArrayAdapter` can reuse older views that are no longer displayed on the screen. The `convertView` parameter of the `getView` method receives the older views using which the `ArrayAdapter` can recycle them. If needed or in case the old view cannot be reused, the `getView` method can create new view as well.
+
+The developers at StackOverflow have warned not to store state data in view as they may be reused and instead store the data in adapters.
 
 ## Notes
 
