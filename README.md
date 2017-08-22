@@ -1,16 +1,3 @@
-# ToDo app demo
-CodePath demo - A simple to do app
-
-This is an Android demo todo list application for displaying and managing a to do list.
-
-Time spent: 6 hours spent in total
-
-
-![Video Walkthrough](https://github.com/omersalar/ToDo-app-demo/blob/master/Todo%20app.gif)
-
-
-
-
 # Pre-work - *SimplyDo*
 
 **SimplyDo** is an android app that allows building a todo list and basic todo items management functionality including adding new items, editing and deleting an existing item.
@@ -23,9 +10,9 @@ Time spent: **8** hours spent in total
 
 The following **required** functionality is completed:
 
-* [checkbox:checked] User can **successfully add and remove items** from the todo list
-* [checkbox:checked] User can **tap a todo item in the list and bring up an edit screen for the todo item** and then have any changes to the text reflected in the todo list.
-* [checkbox:checked] User can **persist todo items** and retrieve them properly on app restart
+* [X] User can **successfully add and remove items** from the todo list
+* [X] User can **tap a todo item in the list and bring up an edit screen for the todo item** and then have any changes to the text reflected in the todo list.
+* [X] User can **persist todo items** and retrieve them properly on app restart
 
 The following **optional** features are implemented:
 
