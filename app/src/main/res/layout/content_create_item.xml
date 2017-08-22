@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.codepath.todo.CreateItemActivity"
+    tools:context="com.codepath.simplydo.CreateItemActivity"
     tools:showIn="@layout/activity_create_item">
 
     <EditText

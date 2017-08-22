@@ -1,4 +1,4 @@
-package com.codepath.todo;
+package com.codepath.simplydo;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
