@@ -31,7 +31,7 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-<img src='https://github.com/omersalar/ToDo-app-demo/blob/master/Todo%20app.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='http://imgur.com/a/kYNUs' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [Peek](https://github.com/phw/peek#peek---an-animated-gif-recorder).
 
