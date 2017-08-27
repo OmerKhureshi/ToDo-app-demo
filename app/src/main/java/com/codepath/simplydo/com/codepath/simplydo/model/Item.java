@@ -8,6 +8,10 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
 
 import java.io.Serializable;
 
+/**
+ * This class represents each item in the list.
+ * This is also mapped as an entity to be created as a table in database.
+ * */
 @Table(database = MyDatabase.class)
 public class Item extends BaseModel implements Serializable{
     @Column

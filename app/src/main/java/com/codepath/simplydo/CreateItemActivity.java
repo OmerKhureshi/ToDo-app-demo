@@ -4,12 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
 import com.codepath.simplydo.com.codepath.simplydo.model.Item;
-
-import java.io.Serializable;
 
 public class CreateItemActivity extends AppCompatActivity {
 
@@ -21,23 +20,28 @@ public class CreateItemActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_item);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Create new to do item");
 
         etItem = ((EditText) findViewById(R.id.etItemName));
 
-        getSupportActionBar().setTitle("Create new to do item");
+        if (BuildConfig.DEBUG) Log.e(Constants.LOG, "CreateItemActivity::onCreate called.");
+
     }
 
+    /**
+     * This method saves the newly created item to the database and also sends it to the calling activity
+     *
+     * @param view The view that was pressed.
+     */
     public void saveItem(View view) {
 
-//        String item = etItem.getText().toString();
         Item item = new Item();
         item.setDesc(etItem.getText().toString());
         item.save();
-        System.out.println("Type item:" + item.getDesc());
+        if (BuildConfig.DEBUG) Log.e(Constants.LOG, "Saved item: " + item);
 
         Bundle bundle = new Bundle();
-        bundle.putSerializable("item", ((Serializable) item));
-
+        bundle.putSerializable("item", item);
 
         Intent data = new Intent(this, MainActivity.class);
         data.putExtras(bundle);
