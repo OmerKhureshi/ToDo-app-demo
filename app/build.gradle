@@ -30,6 +30,29 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
+
+
 dependencies {
     compile 'commons-io:commons-io:2.4'
+}
+
+
+def dbflow_version = "4.0.3"
+
+dependencies {
+    // annotationProcessor now supported in Android Gradle plugin 2.2
+    // See https://bitbucket.org/hvisser/android-apt/wiki/Migration
+    annotationProcessor "com.github.Raizlabs.DBFlow:dbflow-processor:${dbflow_version}"
+    compile "com.github.Raizlabs.DBFlow:dbflow-core:${dbflow_version}"
+    compile "com.github.Raizlabs.DBFlow:dbflow:${dbflow_version}"
+
+    // sql-cipher database encryption (optional)
+    // compile "com.github.Raizlabs.DBFlow:dbflow-sqlcipher:${dbflow_version}"
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        maven { url "https://jitpack.io" }
+    }
 }

@@ -7,6 +7,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 
+import com.codepath.simplydo.com.codepath.simplydo.model.Item;
+
+import java.io.Serializable;
+
 public class CreateItemActivity extends AppCompatActivity {
 
     EditText etItem;
@@ -25,11 +29,18 @@ public class CreateItemActivity extends AppCompatActivity {
 
     public void saveItem(View view) {
 
-        String item = etItem.getText().toString();
-        System.out.println("Type item:" + item);
+//        String item = etItem.getText().toString();
+        Item item = new Item();
+        item.setDesc(etItem.getText().toString());
+        item.save();
+        System.out.println("Type item:" + item.getDesc());
+
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("item", ((Serializable) item));
+
 
         Intent data = new Intent(this, MainActivity.class);
-        data.putExtra(MainActivity.EXTRA_MESSAGE, item);
+        data.putExtras(bundle);
         data.putExtra(MainActivity.EXTRA_MESSAGE_ACTION, "CREATE");
         setResult(RESULT_OK, data);
 

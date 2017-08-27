@@ -15,25 +15,23 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import org.apache.commons.io.FileUtils;
+import com.codepath.simplydo.com.codepath.simplydo.model.Item;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    public static final String EXTRA_MESSAGE = "com.codepath.todo.MESSAGE";
     public static final String EXTRA_MESSAGE_ACTION = "com.codepath.todo.MESSAGE.ACTION";
     public static final String EXTRA_MESSAGE_POS = "com.codepath.todo.MESSAGE.POS";
     public static final int REQUEST_CODE_CREATE = 20;
     public static final int REQUEST_CODE_EDIT = 30;
 
-    private static final String FILE_NAME = "file_todo_list.txt";
-
-    ArrayList<String> itemsArrayList;
-    ArrayAdapter<String> itemsAdapter;
+    ArrayList<Item> itemsArrayList;
+    ArrayAdapter<Item> itemsAdapter;
     ListView lvItems;
 
     @Override
@@ -45,18 +43,22 @@ public class MainActivity extends AppCompatActivity
         getSupportActionBar().setTitle("Your to do list");
 
         lvItems = (ListView) findViewById(R.id.lvItems);
-        readItems();
-        itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, itemsArrayList);
+        itemsArrayList = (ArrayList<Item>) readItemsFromDB();
+
+        itemsAdapter = new ArrayAdapter<Item>(this, android.R.layout.simple_list_item_1, itemsArrayList);
         lvItems.setAdapter(itemsAdapter);
 
         lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String item = itemsArrayList.get(position);
+                Item item = itemsArrayList.get(position);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("item", ((Serializable) item));
                 System.out.println("Item clicked on: " + item);
 
+
                 Intent intent = new Intent(MainActivity.this, EditItemActivity.class);
-                intent.putExtra(EXTRA_MESSAGE, item);
+                intent.putExtras(bundle);
                 intent.putExtra(EXTRA_MESSAGE_POS, position);
                 startActivityForResult(intent, REQUEST_CODE_EDIT);
             }
@@ -130,79 +132,67 @@ public class MainActivity extends AppCompatActivity
             String action = data.getExtras().getString(EXTRA_MESSAGE_ACTION);
 
             if (requestCode == REQUEST_CODE_CREATE) {
+                Item item = (Item) data.getExtras().getSerializable("item");
+                showItem(item);
 
-                String item = data.getExtras().getString(EXTRA_MESSAGE);
-                System.out.println("Created item: " + item);
-                addItem(item);
-
+                System.out.println("Created item: " + item.getDesc());
             } else if (requestCode == REQUEST_CODE_EDIT) {
 
                 if (action.equalsIgnoreCase("EDIT_SAVE")) {
 
-                    String item = data.getExtras().getString(EXTRA_MESSAGE);
+                    Item item = ((Item) data.getExtras().getSerializable("item"));
                     int pos = data.getExtras().getInt(EXTRA_MESSAGE_POS);
+                    itemsArrayList.remove(pos);
+                    itemsArrayList.add(pos, item);
+                    itemsAdapter.notifyDataSetChanged();
+
                     System.out.println("Edited item: " + item);
-                    addItem(pos, item);
 
 
                 } else if (action.equalsIgnoreCase("EDIT_DELETE")) {
 
                     int pos = data.getExtras().getInt(EXTRA_MESSAGE_POS);
+                    itemsArrayList.remove(pos);
+                    itemsAdapter.notifyDataSetChanged();
                     System.out.println("deleting " + pos);
-                    removeItem(pos);
                 }
             }
 
-            itemsAdapter.notifyDataSetChanged();
+
         }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        writeItems();
+    }
+
+    public List<Item> readItemsFromDB() {
+        return SQLite.select().
+                from(Item.class).queryList();
+    }
+
+    public void newItem(String desc) {
+        Item item = new Item();
+        item.setDesc(desc);
+        item.save();
+
+        showItem(item);
     }
 
 
-    public void addItem(String item) {
+    public void showItem(Item item) {
         itemsArrayList.add(item);
         itemsAdapter.notifyDataSetChanged();
     }
 
-    public void addItem(int pos, String item) {
-        itemsArrayList.set(pos, item);
-        itemsAdapter.notifyDataSetChanged();
+    public void showEditedItem(int pos, Item item) {
+
     }
 
-    public void readItems() {
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        try {
-            itemsArrayList = new ArrayList<String>(FileUtils.readLines(todoFile));
-        } catch (IOException e) {
-            itemsArrayList = new ArrayList<String>();
-            itemsArrayList.add("Welcome!");
-            itemsArrayList.add("Click on me to edit");
-            itemsArrayList.add("You can delete as well");
-            itemsArrayList.add("Press on add to create new item");
+    public void deleteItem() {
 
-        }
     }
 
-    public void writeItems() {
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        try {
-            FileUtils.writeLines(todoFile, itemsArrayList);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public void removeItem(int pos) {
-        itemsArrayList.remove(pos);
-        itemsAdapter.notifyDataSetChanged();
-    }
 
 }

@@ -9,11 +9,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
+import com.codepath.simplydo.com.codepath.simplydo.model.Item;
+
+import java.io.Serializable;
+
 public class EditItemActivity extends AppCompatActivity {
 
     EditText etEditItem;
     int position;
-    String item;
+    Item item;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,10 +26,11 @@ public class EditItemActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        item = getIntent().getExtras().getString(MainActivity.EXTRA_MESSAGE);
+        item = ((Item) getIntent().getExtras().getSerializable("item"));
+
         position = getIntent().getExtras().getInt(MainActivity.EXTRA_MESSAGE_POS);
         etEditItem = ((EditText) findViewById(R.id.etEditItem));
-        etEditItem.setText(item);
+        etEditItem.setText(item.getDesc());
         etEditItem.requestFocus();
         etEditItem.append("");
         getSupportActionBar().setTitle("Edit to do item");
@@ -33,11 +38,17 @@ public class EditItemActivity extends AppCompatActivity {
 
     public void saveEditedItem(View view) {
 
-        String item = etEditItem.getText().toString();
+        String desc = etEditItem.getText().toString();
+        item.setDesc(desc);
+        item.save();
         System.out.println("Edited: " + item);
 
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("item", ((Serializable) item));
+
+
         Intent data = new Intent(this, MainActivity.class);
-        data.putExtra(MainActivity.EXTRA_MESSAGE, item);
+        data.putExtras(bundle);
         data.putExtra(MainActivity.EXTRA_MESSAGE_POS, position);
         data.putExtra(MainActivity.EXTRA_MESSAGE_ACTION, "EDIT_SAVE");
         setResult(RESULT_OK, data);
@@ -57,6 +68,9 @@ public class EditItemActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.action_delete) {
             System.out.println("deleting,,,");
+
+            this.item.delete();
+
             Intent data = new Intent(this, MainActivity.class);
             data.putExtra(MainActivity.EXTRA_MESSAGE_POS, position);
             data.putExtra(MainActivity.EXTRA_MESSAGE_ACTION, "EDIT_DELETE");
