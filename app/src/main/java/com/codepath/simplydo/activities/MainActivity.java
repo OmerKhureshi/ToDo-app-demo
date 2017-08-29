@@ -1,4 +1,4 @@
-package com.codepath.simplydo;
+package com.codepath.simplydo.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,20 +8,25 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.codepath.simplydo.com.codepath.simplydo.model.Item;
+import com.codepath.simplydo.BuildConfig;
+import com.codepath.simplydo.Constants;
+import com.codepath.simplydo.R;
+import com.codepath.simplydo.adapters.CustomAdapter;
+import com.codepath.simplydo.model.Item;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
@@ -37,56 +42,34 @@ public class MainActivity extends AppCompatActivity
     ArrayAdapter<Item> itemsAdapter;
 
     ListView lvItems;
+    RecyclerView recyclerView;
+    RecyclerView.LayoutManager layoutManager;
+    CustomAdapter customAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Your to do list");
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
 
         if (BuildConfig.DEBUG) Log.e(Constants.LOG, "MainActivity::onCreate called.");
 
-        lvItems = (ListView) findViewById(R.id.lvItems);
+        setUpActivity();
         itemsArrayList = (ArrayList<Item>) readItemsFromDB();
-
-        itemsAdapter = new ArrayAdapter<Item>(this, android.R.layout.simple_list_item_1, itemsArrayList);
-        lvItems.setAdapter(itemsAdapter);
-
-
-        lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                Item item = itemsArrayList.get(position);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("item", ((Serializable) item));
-
-                if (BuildConfig.DEBUG) Log.e(Constants.LOG, "Item clicked. Item: " + item + " at position: " + position);
-
-                Intent intent = new Intent(MainActivity.this, EditItemActivity.class);
-                intent.putExtras(bundle);
-                intent.putExtra(EXTRA_MESSAGE_POS, position);
-                startActivityForResult(intent, REQUEST_CODE_EDIT);
-            }
-        });
+//        setUpListView();
 
         if (isFirstRun()) {
             if (BuildConfig.DEBUG) Log.e(Constants.LOG, "First run of the app.");
             runFirstTime();
         }
 
+        setUpRecyclerView();
     }
 
+    /**
+     * This method is called when the add fab button is pressed.
+     * Thie method calls card_view new Activity where new tasks can be added.
+     * @param view
+     */
     public void createItem(View view) {
         if (BuildConfig.DEBUG) Log.e(Constants.LOG, "Clicked fab button.");
 
@@ -115,7 +98,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // as you specify card_view parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -131,7 +114,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -153,7 +135,8 @@ public class MainActivity extends AppCompatActivity
 
                 Item item = (Item) data.getExtras().getSerializable("item");
                 itemsArrayList.add(item);
-                itemsAdapter.notifyDataSetChanged();
+//                itemsAdapter.notifyDataSetChanged();
+                customAdapter.notifyDataSetChanged();
 
                 if (BuildConfig.DEBUG)
                     Log.e(Constants.LOG, "Created item: " + item);
@@ -168,7 +151,8 @@ public class MainActivity extends AppCompatActivity
                     int pos = data.getExtras().getInt(EXTRA_MESSAGE_POS);
                     itemsArrayList.remove(pos);
                     itemsArrayList.add(pos, item);
-                    itemsAdapter.notifyDataSetChanged();
+//                    itemsAdapter.notifyDataSetChanged();
+                    customAdapter.notifyDataSetChanged();
 
                     if (BuildConfig.DEBUG) Log.e(Constants.LOG, "Edited item: " + item);
 
@@ -176,7 +160,8 @@ public class MainActivity extends AppCompatActivity
 
                     int pos = data.getExtras().getInt(EXTRA_MESSAGE_POS);
                     itemsArrayList.remove(pos);
-                    itemsAdapter.notifyDataSetChanged();
+//                    itemsAdapter.notifyDataSetChanged();
+                    customAdapter.notifyDataSetChanged();
 
                     if (BuildConfig.DEBUG) Log.e(Constants.LOG, "Deleted item at position: " + pos);
 
@@ -189,7 +174,7 @@ public class MainActivity extends AppCompatActivity
 
 
     /**
-     * This is a convenience method to read all items from database
+     * This is card_view convenience method to read all items from database
      *
      * @return A list of Item objects stored in database.
      */
@@ -201,7 +186,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * This method checks if the app is running for the first time or not.
      *
-     * @return True if this app is running first time. Running first time after a version upgrade also return true. Other wise return false.
+     * @return True if this app is running first time. Running first time after card_view version upgrade also return true. Other wise return false.
      */
     private boolean isFirstRun() {
         SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFS_NAME, MODE_PRIVATE);
@@ -225,23 +210,87 @@ public class MainActivity extends AppCompatActivity
      * This method add items to ArrayList for the first time run.
      */
     private void runFirstTime() {
-        newItem("Welcome to SimplyDo!");
-        newItem("You can create a new item by pressing on the add button.");
-        newItem("You can edit by pressing on the item.");
-        newItem("You can also delete. Just click on item and press delete.");
+        newItem("Welcome to SimplyDo!", "High");
+        newItem("You can create new tasks by pressing on add button.", "Medium");
+        newItem("You can edit a task by pressing on it.", "Low");
+        newItem("You can also delete tasks. Just press on a task and press delete.", "Medium");
     }
 
 
     /**
-     * This is a convenience method to create a new item and dislplay on the UI
+     * This is card_view convenience method to create card_view new item and dislplay on the UI
      */
-    private void newItem(String desc) {
+    private void newItem(String desc, String priority) {
         Item item = new Item();
         item.setDesc(desc);
+        item.setPriority(priority);
+        item.setDueDate(new Date());
         item.save();
 
         itemsArrayList.add(item);
-        itemsAdapter.notifyDataSetChanged();
+//        itemsAdapter.notifyDataSetChanged();
     }
+
+
+    /**
+     * This method initializes and sets up the Activity.
+     */
+    private void setUpActivity() {
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Your to do list");
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    /**
+     * This method initializes and sets up the ListView for to-do items.
+     */
+//    private void setUpListView() {
+//        lvItems = (ListView) findViewById(R.id.lvItems);
+//        itemsAdapter = new ArrayAdapter<Item>(this, android.R.layout.simple_list_item_1, itemsArrayList);
+//        lvItems.setAdapter(itemsAdapter);
+//
+//        lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//
+//                Item item = itemsArrayList.get(position);
+//                Bundle bundle = new Bundle();
+//                bundle.putSerializable("item", ((Serializable) item));
+//
+//                if (BuildConfig.DEBUG) Log.e(Constants.LOG, "Item clicked. Item: " + item + " at position: " + position);
+//
+//                Intent intent = new Intent(MainActivity.this, EditItemActivity.class);
+//                intent.putExtras(bundle);
+//                intent.putExtra(EXTRA_MESSAGE_POS, position);
+//                startActivityForResult(intent, REQUEST_CODE_EDIT);
+//            }
+//        });
+//    }
+
+
+    /**
+     * This method initializes and sets up the Recycler View for to-do items.
+     */
+    private void setUpRecyclerView() {
+        recyclerView = ((RecyclerView) findViewById(R.id.rvItems));
+        recyclerView.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        customAdapter = new CustomAdapter(itemsArrayList, this);
+        recyclerView.setAdapter(customAdapter);
+        customAdapter.notifyDataSetChanged();
+
+    }
+
 
 }

@@ -1,4 +1,4 @@
-package com.codepath.simplydo;
+package com.codepath.simplydo.activities;
 
 import android.app.Application;
 

@@ -1,4 +1,4 @@
-package com.codepath.simplydo.com.codepath.simplydo.model;
+package com.codepath.simplydo.model;
 
 import com.raizlabs.android.dbflow.annotation.Database;
 

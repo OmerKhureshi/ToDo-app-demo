@@ -3,7 +3,7 @@
     package="com.codepath.simplydo">
 
     <application
-        android:name=".MyApplication"
+        android:name=".activities.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.codepath.simplydo.MainActivity"
+            android:name="com.codepath.simplydo.activities.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -21,11 +21,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.codepath.simplydo.CreateItemActivity"
+            android:name="com.codepath.simplydo.activities.CreateItemActivity"
             android:label="@string/title_activity_create_item"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.codepath.simplydo.EditItemActivity"
+            android:name="com.codepath.simplydo.activities.EditItemActivity"
             android:label="@string/title_activity_edit_item"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
