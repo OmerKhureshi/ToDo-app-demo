@@ -15,8 +15,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 import com.codepath.simplydo.BuildConfig;
 import com.codepath.simplydo.Constants;
@@ -39,9 +37,7 @@ public class MainActivity extends AppCompatActivity
 
     public static final int REQUEST_CODE_EDIT = 30;
     ArrayList<Item> itemsArrayList;
-    ArrayAdapter<Item> itemsAdapter;
 
-    ListView lvItems;
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
     CustomAdapter customAdapter;
@@ -55,7 +51,6 @@ public class MainActivity extends AppCompatActivity
 
         setUpActivity();
         itemsArrayList = (ArrayList<Item>) readItemsFromDB();
-//        setUpListView();
 
         if (isFirstRun()) {
             if (BuildConfig.DEBUG) Log.e(Constants.LOG, "First run of the app.");
@@ -68,6 +63,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * This method is called when the add fab button is pressed.
      * Thie method calls card_view new Activity where new tasks can be added.
+     *
      * @param view
      */
     public void createItem(View view) {
@@ -135,7 +131,6 @@ public class MainActivity extends AppCompatActivity
 
                 Item item = (Item) data.getExtras().getSerializable("item");
                 itemsArrayList.add(item);
-//                itemsAdapter.notifyDataSetChanged();
                 customAdapter.notifyDataSetChanged();
 
                 if (BuildConfig.DEBUG)
@@ -151,7 +146,6 @@ public class MainActivity extends AppCompatActivity
                     int pos = data.getExtras().getInt(EXTRA_MESSAGE_POS);
                     itemsArrayList.remove(pos);
                     itemsArrayList.add(pos, item);
-//                    itemsAdapter.notifyDataSetChanged();
                     customAdapter.notifyDataSetChanged();
 
                     if (BuildConfig.DEBUG) Log.e(Constants.LOG, "Edited item: " + item);
@@ -160,7 +154,6 @@ public class MainActivity extends AppCompatActivity
 
                     int pos = data.getExtras().getInt(EXTRA_MESSAGE_POS);
                     itemsArrayList.remove(pos);
-//                    itemsAdapter.notifyDataSetChanged();
                     customAdapter.notifyDataSetChanged();
 
                     if (BuildConfig.DEBUG) Log.e(Constants.LOG, "Deleted item at position: " + pos);
@@ -228,7 +221,6 @@ public class MainActivity extends AppCompatActivity
         item.save();
 
         itemsArrayList.add(item);
-//        itemsAdapter.notifyDataSetChanged();
     }
 
 
@@ -249,32 +241,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
     }
-
-    /**
-     * This method initializes and sets up the ListView for to-do items.
-     */
-//    private void setUpListView() {
-//        lvItems = (ListView) findViewById(R.id.lvItems);
-//        itemsAdapter = new ArrayAdapter<Item>(this, android.R.layout.simple_list_item_1, itemsArrayList);
-//        lvItems.setAdapter(itemsAdapter);
-//
-//        lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//
-//                Item item = itemsArrayList.get(position);
-//                Bundle bundle = new Bundle();
-//                bundle.putSerializable("item", ((Serializable) item));
-//
-//                if (BuildConfig.DEBUG) Log.e(Constants.LOG, "Item clicked. Item: " + item + " at position: " + position);
-//
-//                Intent intent = new Intent(MainActivity.this, EditItemActivity.class);
-//                intent.putExtras(bundle);
-//                intent.putExtra(EXTRA_MESSAGE_POS, position);
-//                startActivityForResult(intent, REQUEST_CODE_EDIT);
-//            }
-//        });
-//    }
 
 
     /**

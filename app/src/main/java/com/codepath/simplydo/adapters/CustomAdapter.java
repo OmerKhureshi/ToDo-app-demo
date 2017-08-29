@@ -85,8 +85,8 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         Calendar cal = Calendar.getInstance();
         cal.setTime(dueDate);
 
-        holder.tvDueDateCard.setText(cal.get(Calendar.MONTH) + "/"
-                        + cal.get(Calendar.DAY_OF_MONTH) + "/"
+        holder.tvDueDateCard.setText((cal.get(Calendar.MONTH) + 1) + "/"
+                        + cal.get(Calendar.DAY_OF_MONTH)+ "/"
                         + cal.get(Calendar.YEAR));
 
 
